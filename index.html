@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>航空发动机电气化 — Flight Electrification</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
 
   :root {
     --cyan: #00838f; --blue: #0d47a1; --gold: #f9a825;
@@ -14,7 +14,7 @@
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    font-family: 'Noto Sans SC', sans-serif;
+    font-family: 'Microsoft YaHei','PingFang SC',sans-serif;
     overflow: hidden; height: 100vh; width: 100vw;
     background: linear-gradient(180deg, #e3f0f8 0%, #c5ddf0 30%, #a3cce8 60%, #7ab8de 100%);
     user-select: none; -webkit-user-select: none;
@@ -98,23 +98,23 @@
     padding:48px; text-align:center;
   }
   .hero-content h1 {
-    font-family:'Orbitron',monospace; font-size:clamp(1.8rem,4vw,3rem);
+    font-family:'Courier New','Source Code Pro',monospace; font-size:clamp(1.8rem,4vw,3rem);
     font-weight:900; letter-spacing:4px; color:#fff;
     text-shadow:0 2px 20px rgba(0,0,0,0.3); margin-bottom:8px;
   }
   .hero-content .sub {
-    font-family:'Orbitron',monospace; font-size:0.85rem; color:rgba(255,255,255,0.85);
+    font-family:'Courier New','Source Code Pro',monospace; font-size:0.85rem; color:rgba(255,255,255,0.85);
     letter-spacing:6px; text-transform:uppercase; margin-bottom:6px;
   }
 
   .section-tag {
-    display:inline-block; font-family:'Orbitron',monospace;
+    display:inline-block; font-family:'Courier New','Source Code Pro',monospace;
     font-size:10px; color:var(--cyan); letter-spacing:4px;
     margin-bottom:6px; padding:2px 10px;
     border:1px solid rgba(0,131,143,0.3); border-radius:4px;
   }
   h2 {
-    font-family:'Orbitron',monospace; font-size:1.35rem; color:var(--text);
+    font-family:'Courier New','Source Code Pro',monospace; font-size:1.35rem; color:var(--text);
     letter-spacing:2px; margin-bottom:14px;
   }
   h3 { color:var(--text); font-size:0.95rem; margin-bottom:4px; font-weight:600; }
@@ -145,7 +145,7 @@
   table { width:100%; border-collapse:collapse; font-size:0.78rem; }
   thead th {
     background:rgba(0,131,143,0.05); padding:10px 12px; text-align:left;
-    font-family:'Orbitron',monospace; font-size:9px; color:var(--cyan); letter-spacing:1.5px;
+    font-family:'Courier New','Source Code Pro',monospace; font-size:9px; color:var(--cyan); letter-spacing:1.5px;
     border-bottom:2px solid rgba(0,131,143,0.15);
   }
   tbody td { padding:9px 12px; border-bottom:1px solid rgba(0,0,0,0.03); color:var(--text-dim); font-size:0.76rem; }
@@ -163,7 +163,7 @@
     position:absolute; left:-30px; top:2px; width:12px; height:12px; border-radius:50%;
     background:var(--cyan); border:2px solid white; box-shadow:0 0 10px rgba(0,131,143,0.3);
   }
-  .tl-y { font-family:'Orbitron',monospace; color:var(--cyan); font-size:0.8rem; font-weight:700; }
+  .tl-y { font-family:'Courier New','Source Code Pro',monospace; color:var(--cyan); font-size:0.8rem; font-weight:700; }
   .tl-i h4 { color:var(--text); font-size:0.85rem; margin:1px 0; }
   .tl-i p { color:var(--text-dim); font-size:0.74rem; }
 
@@ -175,7 +175,7 @@
     backdrop-filter:blur(6px); transition:all 0.3s; cursor:default;
   }
   .stat:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
-  .stat-val { font-family:'Orbitron',monospace; font-size:2rem; font-weight:900; color:var(--blue); }
+  .stat-val { font-family:'Courier New','Source Code Pro',monospace; font-size:2rem; font-weight:900; color:var(--blue); }
   .stat-lbl { color:var(--text-dim); font-size:0.8rem; margin-top:6px; }
 
   /* === PLAYERS === */
@@ -220,7 +220,7 @@
   .page-dot.active { background:var(--cyan); box-shadow:0 0 8px rgba(0,131,143,0.4); transform:scale(1.35); }
   .page-num {
     position:fixed; bottom:18px; right:24px; z-index:100;
-    font-family:'Orbitron',monospace; font-size:11px; color:rgba(13,33,55,0.3); letter-spacing:2px;
+    font-family:'Courier New','Source Code Pro',monospace; font-size:11px; color:rgba(13,33,55,0.3); letter-spacing:2px;
   }
 
   /* === MODAL === */
@@ -239,11 +239,11 @@
     animation:modalIn 0.35s cubic-bezier(.25,.8,.25,1.2);
   }
   @keyframes modalIn { from{transform:translateY(30px) scale(0.9); opacity:0} }
-  .modal-box h3 { font-family:'Orbitron',monospace; color:var(--cyan); margin-bottom:12px; letter-spacing:2px; }
+  .modal-box h3 { font-family:'Courier New','Source Code Pro',monospace; color:var(--cyan); margin-bottom:12px; letter-spacing:2px; }
   .modal-box p { color:var(--text-dim); margin-bottom:20px; font-size:0.9rem; }
   .modal-btn {
     background:var(--cyan); color:white; border:none; padding:10px 28px;
-    border-radius:24px; cursor:pointer; letter-spacing:1px; font-family:'Noto Sans SC',sans-serif;
+    border-radius:24px; cursor:pointer; letter-spacing:1px; font-family:'Microsoft YaHei',sans-serif;
     transition:all 0.3s;
   }
   .modal-btn:hover { background:#006064; box-shadow:0 4px 14px rgba(0,131,143,0.25); }
@@ -299,7 +299,7 @@
       <p class="sub">Flight Electrification</p>
       <h1>航空发动机<br>电气化</h1>
       <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-top:12px;">从辅助系统到主推进系统 · 用电能重新定义飞行的未来</p>
-      <p style="font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:3px;margin-top:20px;" class="cover-hint">→ 点击页面两侧或按方向键翻页 →</p>
+      <p style="font-family:'Courier New','Source Code Pro',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:3px;margin-top:20px;" class="cover-hint">→ 点击页面两侧或按方向键翻页 →</p>
     </div>
   </div>
 </div>
@@ -403,10 +403,10 @@
     <div class="section-tag">功率等级演进</div>
     <svg viewBox="0 0 720 80" style="width:100%;max-width:720px;margin-top:8px;">
       <line x1="30" y1="50" x2="690" y2="50" stroke="rgba(0,131,143,0.2)" stroke-width="2"/>
-      <circle cx="140" cy="50" r="9" fill="#00838f"/><text x="140" y="34" text-anchor="middle" fill="#00838f" font-size="9" font-family="Orbitron">1MW</text><text x="140" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">787 / 当前</text>
-      <circle cx="310" cy="50" r="12" fill="#f9a825"/><text x="310" y="32" text-anchor="middle" fill="#f9a825" font-size="9" font-family="Orbitron">2~5MW</text><text x="310" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">E-Fan X / STARC-ABL</text>
-      <circle cx="500" cy="50" r="15" fill="#ef6c00"/><text x="500" y="30" text-anchor="middle" fill="#ef6c00" font-size="9" font-family="Orbitron">10~20MW</text><text x="500" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">支线客机混动</text>
-      <circle cx="660" cy="50" r="18" fill="#c62828"/><text x="660" y="28" text-anchor="middle" fill="#c62828" font-size="9" font-family="Orbitron">50MW+</text><text x="660" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">大型宽体客机</text>
+      <circle cx="140" cy="50" r="9" fill="#00838f"/><text x="140" y="34" text-anchor="middle" fill="#00838f" font-size="9" font-family="monospace">1MW</text><text x="140" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Microsoft YaHei,PingFang SC,sans-serif">787 / 当前</text>
+      <circle cx="310" cy="50" r="12" fill="#f9a825"/><text x="310" y="32" text-anchor="middle" fill="#f9a825" font-size="9" font-family="monospace">2~5MW</text><text x="310" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Microsoft YaHei,PingFang SC,sans-serif">E-Fan X / STARC-ABL</text>
+      <circle cx="500" cy="50" r="15" fill="#ef6c00"/><text x="500" y="30" text-anchor="middle" fill="#ef6c00" font-size="9" font-family="monospace">10~20MW</text><text x="500" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Microsoft YaHei,PingFang SC,sans-serif">支线客机混动</text>
+      <circle cx="660" cy="50" r="18" fill="#c62828"/><text x="660" y="28" text-anchor="middle" fill="#c62828" font-size="9" font-family="monospace">50MW+</text><text x="660" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Microsoft YaHei,PingFang SC,sans-serif">大型宽体客机</text>
       <line x1="30" y1="50" x2="660" y2="50" stroke="rgba(13,71,161,0.3)" stroke-width="2.5"/>
     </svg>
   </div>
@@ -440,10 +440,10 @@
     <div class="section-tag">06 / Players</div>
     <h2>全球主要参与者</h2>
     <div class="pl-grid">
-      <a class="pl" href="https://www.nasa.gov/directorates/armd/integrated-aviation-systems-program/armd-iasp-epfd/about-electrified-powertrain-flight-demonstration-project/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🚀</div><div class="pl-info"><h4>NASA</h4><div class="org">美国国家航空航天局</div><div class="desc">N3-X / STARC-ABL涡轮电推进，NEAT试验平台，50MW级分布式推进概念</div></div></a>
-      <a class="pl" href="https://www.rolls-royce.com/innovation/electrical.aspx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">✈️</div><div class="pl-info"><h4>Rolls-Royce</h4><div class="org">罗尔斯·罗伊斯</div><div class="desc">E-Fan X、ACCEL竞速机(623km/h世界纪录)、M250混动、E2SG嵌入式发电机</div></div></a>
+      <a class="pl" href="https://www.aerospacetestinginternational.com/news/electric-hybrid/nasa-completes-first-phase-of-major-hybrid-electric-aircraft-test-program.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🚀</div><div class="pl-info"><h4>NASA</h4><div class="org">美国国家航空航天局</div><div class="desc">N3-X / STARC-ABL涡轮电推进，NEAT试验平台，50MW级分布式推进概念</div></div></a>
+      <a class="pl" href="https://www.rolls-royce.com/media/press-releases/2022/20-01-2022-the-spirit-of-innovation-officially-breaks-speed-record.aspx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">✈️</div><div class="pl-info"><h4>Rolls-Royce</h4><div class="org">罗尔斯·罗伊斯</div><div class="desc">ACCEL竞速机(623km/h世界纪录)、M250混动、E2SG嵌入式发电机(2024年已退出电动航空)</div></div></a>
       <a class="pl" href="https://www.airbus.com/en/innovation/energy-transition/hydrogen/zeroe" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🛫</div><div class="pl-info"><h4>Airbus</h4><div class="org">空中客车</div><div class="desc">ZeroE氢能概念机、四台2MW燃料电池电机、2027年地面集成测试</div></div></a>
-      <a class="pl" href="https://www.geaerospace.com/news/press-releases/ge-aerospace-successfully-demonstrates-narrowbody-hybrid-electric-engine-system" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">⚙️</div><div class="pl-info"><h4>GE / 赛峰 / 普惠</h4><div class="org">发动机三巨头</div><div class="desc">GE混动涡扇地面演示成功；赛峰ENGINeUS电机；普惠为混动支线机供GTF</div></div></a>
+      <a class="pl" href="https://interestingengineering.com/transportation/hybrid-electric-jet-engine-ground-test" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">⚙️</div><div class="pl-info"><h4>GE / 赛峰 / 普惠</h4><div class="org">发动机三巨头</div><div class="desc">GE混动涡扇地面演示成功(+20%效率)；赛峰ENGINeUS电机；普惠GTF混动支线方案</div></div></a>
       <a class="pl" href="https://aerospace.honeywell.com/us/en/pages/hybrid-electric-electric-propulsion" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🔧</div><div class="pl-info"><h4>Honeywell</h4><div class="org">霍尼韦尔</div><div class="desc">1MW级混动涡轮发电机、与DENSO联合开发电动飞机马达、Vertical Aerospace VX4合作</div></div></a>
       <a class="pl" href="http://www.aecc.cn/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🇨🇳</div><div class="pl-info"><h4>中国航发 AECC</h4><div class="org">中国航空发动机集团</div><div class="desc">多电发动机控制系统自主化、兆瓦级混动系统，与高校联合攻关超20项</div></div></a>
       <a class="pl" href="http://news.hust.edu.cn/info/1003/50657.htm" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🎓</div><div class="pl-info"><h4>华中科技大学</h4><div class="org">曲荣海团队 · IEEE Fellow</div><div class="desc">磁场调制型高功率密度电机系统，电机功率密度国际领先，中标航发兆瓦级电机</div></div></a>
@@ -465,7 +465,7 @@
         航空发动机电气化是航空业实现<b>2050碳中和</b>目标的关键路径<br><br>
         从辅助系统电气化到纯电推进，每一步都在重新定义飞行
       </p>
-      <p style="font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:3px;margin-top:20px;">⏣ END OF BOOK ⏣</p>
+      <p style="font-family:'Courier New','Source Code Pro',monospace;font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:3px;margin-top:20px;">⏣ END OF BOOK ⏣</p>
     </div>
   </div>
 </div>
