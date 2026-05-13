@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>航空发动机电气化 — Flight Electrification</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --cyan: #00838f; --blue: #0d47a1; --gold: #f9a825;
+    --red: #c62828; --text: #0d2137; --text-dim: #446688;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    overflow: hidden; height: 100vh; width: 100vw;
+    background: linear-gradient(180deg, #e3f0f8 0%, #c5ddf0 30%, #a3cce8 60%, #7ab8de 100%);
+    user-select: none; -webkit-user-select: none;
+  }
+
+  /* Sky canvas + grid */
+  #skyCanvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .grid-bg {
+    position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.04;
+    background-image: linear-gradient(rgba(13,71,161,0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(13,71,161,0.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Cursor trail */
+  .cursor-dot {
+    position:fixed; pointer-events:none; z-index:9999;
+    border-radius:50%; background:rgba(0,131,143,0.55);
+    transform:translate(-50%,-50%); transition:opacity 0.6s;
+    box-shadow:0 0 10px rgba(0,131,143,0.35);
+  }
+
+  /* Stage */
+  .stage {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center; z-index:2;
+  }
+  .deck {
+    position:relative;
+    width:min(96vw, 1200px); height:min(94vh, 760px);
+  }
+
+  /* === PAGE === */
+  .page {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    border-radius:12px; overflow:hidden;
+    transition: transform 0.65s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease;
+    box-shadow: 0 8px 48px rgba(13,33,55,0.12);
+    opacity:0; pointer-events:none;
+    display:flex; flex-direction:column;
+  }
+  .page.active {
+    transform: translateX(0); opacity:1; pointer-events:auto; z-index:2;
+  }
+  .page.left { transform: translateX(-105%); opacity:0; z-index:1; }
+  .page.right { transform: translateX(105%); opacity:0; z-index:0; }
+
+  /* === PAGE INTERNAL LAYOUT === */
+  .page-hero {
+    position:relative; flex:0 0 42%; overflow:hidden;
+    background:#c5ddf0;
+  }
+  .page-hero img {
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .page-hero .hero-overlay {
+    position:absolute; bottom:0; left:0; right:0; height:60%;
+    background: linear-gradient(transparent, rgba(248,250,252,0.95));
+    pointer-events:none;
+  }
+  .page-hero.full { flex:1; }
+  .page-hero.full .hero-overlay {
+    height:100%;
+    background: linear-gradient(180deg, rgba(13,33,55,0.35) 0%, rgba(13,33,55,0.15) 50%, rgba(13,33,55,0.5) 100%);
+  }
+
+  .page-body {
+    flex:1; padding: 24px 40px 28px;
+    background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+    overflow-y:auto; position:relative; z-index:1;
+  }
+  .page-body.centered {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+  }
+  .page-body.no-pad { padding:0; }
+
+  /* Content on full-image pages */
+  .hero-content {
+    position:absolute; bottom:0; left:0; right:0; z-index:2;
+    padding:48px; text-align:center;
+  }
+  .hero-content h1 {
+    font-family:'Orbitron',monospace; font-size:clamp(1.8rem,4vw,3rem);
+    font-weight:900; letter-spacing:4px; color:#fff;
+    text-shadow:0 2px 20px rgba(0,0,0,0.3); margin-bottom:8px;
+  }
+  .hero-content .sub {
+    font-family:'Orbitron',monospace; font-size:0.85rem; color:rgba(255,255,255,0.85);
+    letter-spacing:6px; text-transform:uppercase; margin-bottom:6px;
+  }
+
+  .section-tag {
+    display:inline-block; font-family:'Orbitron',monospace;
+    font-size:10px; color:var(--cyan); letter-spacing:4px;
+    margin-bottom:6px; padding:2px 10px;
+    border:1px solid rgba(0,131,143,0.3); border-radius:4px;
+  }
+  h2 {
+    font-family:'Orbitron',monospace; font-size:1.35rem; color:var(--text);
+    letter-spacing:2px; margin-bottom:14px;
+  }
+  h3 { color:var(--text); font-size:0.95rem; margin-bottom:4px; font-weight:600; }
+
+  /* === CARDS === */
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .card {
+    background:rgba(255,255,255,0.7); border:1px solid rgba(0,0,0,0.06);
+    border-radius:10px; padding:20px; cursor:pointer;
+    transition:all 0.3s; position:relative; overflow:hidden;
+    backdrop-filter:blur(6px); box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  }
+  .card:hover {
+    transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.1);
+    border-color:rgba(0,131,143,0.35); background:rgba(255,255,255,0.9);
+  }
+  .card:active { transform:scale(0.96); }
+  .card::after {
+    content:'↗'; position:absolute; top:10px; right:14px; font-size:11px;
+    color:var(--cyan); opacity:0; transition:opacity 0.3s;
+  }
+  .card:hover::after { opacity:1; }
+  .card-icon { font-size:1.6rem; margin-bottom:8px; }
+  .card p { color:var(--text-dim); font-size:0.78rem; line-height:1.6; }
+
+  /* === TABLE === */
+  .tbl-wrap { overflow-x:auto; border-radius:8px; border:1px solid rgba(0,131,143,0.1); }
+  table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+  thead th {
+    background:rgba(0,131,143,0.05); padding:10px 12px; text-align:left;
+    font-family:'Orbitron',monospace; font-size:9px; color:var(--cyan); letter-spacing:1.5px;
+    border-bottom:2px solid rgba(0,131,143,0.15);
+  }
+  tbody td { padding:9px 12px; border-bottom:1px solid rgba(0,0,0,0.03); color:var(--text-dim); font-size:0.76rem; }
+  tbody tr:hover td { background:rgba(0,131,143,0.02); color:var(--text); }
+  tbody tr:last-child td { border-bottom:none; }
+
+  /* === TIMELINE === */
+  .tl { position:relative; padding-left:28px; }
+  .tl::before {
+    content:''; position:absolute; left:5px; top:0; bottom:0;
+    width:2px; background:linear-gradient(180deg,var(--cyan),var(--blue),rgba(0,131,143,0.15));
+  }
+  .tl-i { position:relative; margin-bottom:18px; }
+  .tl-d {
+    position:absolute; left:-30px; top:2px; width:12px; height:12px; border-radius:50%;
+    background:var(--cyan); border:2px solid white; box-shadow:0 0 10px rgba(0,131,143,0.3);
+  }
+  .tl-y { font-family:'Orbitron',monospace; color:var(--cyan); font-size:0.8rem; font-weight:700; }
+  .tl-i h4 { color:var(--text); font-size:0.85rem; margin:1px 0; }
+  .tl-i p { color:var(--text-dim); font-size:0.74rem; }
+
+  /* === STATS === */
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; }
+  .stat {
+    background:rgba(255,255,255,0.7); border:1px solid rgba(0,0,0,0.06);
+    border-radius:10px; padding:18px 14px; text-align:center;
+    backdrop-filter:blur(6px); transition:all 0.3s; cursor:default;
+  }
+  .stat:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
+  .stat-val { font-family:'Orbitron',monospace; font-size:2rem; font-weight:900; color:var(--blue); }
+  .stat-lbl { color:var(--text-dim); font-size:0.8rem; margin-top:6px; }
+
+  /* === PLAYERS === */
+  .pl-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+  .pl {
+    background:rgba(255,255,255,0.7); border:1px solid rgba(0,0,0,0.06);
+    border-radius:10px; padding:16px; display:flex; gap:10px; align-items:flex-start;
+    backdrop-filter:blur(6px); transition:all 0.3s; cursor:pointer;
+  }
+  .pl:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,0.08); border-color:rgba(0,131,143,0.3); }
+  .pl-av {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--cyan),var(--blue));
+    color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+  }
+  .pl-info h4 { font-size:0.82rem; color:var(--text); margin-bottom:2px; }
+  .pl-info .org { color:var(--cyan); font-size:0.7rem; margin-bottom:2px; }
+  .pl-info .desc { color:var(--text-dim); font-size:0.72rem; }
+
+  /* === NAV ARROWS === */
+  .nav-arrow {
+    position:fixed; top:50%; z-index:100; width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,0.55); backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.7); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.3s; transform:translateY(-50%);
+    box-shadow:0 2px 12px rgba(0,0,0,0.05);
+  }
+  .nav-arrow:hover { background:rgba(255,255,255,0.85); box-shadow:0 4px 20px rgba(0,131,143,0.18); transform:translateY(-50%) scale(1.06); }
+  .nav-arrow:active { transform:translateY(-50%) scale(0.94); }
+  .nav-arrow.disabled { opacity:0.15; pointer-events:none; }
+  .nav-prev { left:max(6px, calc((100vw - 1200px)/2 - 56px)); }
+  .nav-next { right:max(6px, calc((100vw - 1200px)/2 - 56px)); }
+  .nav-arrow svg { width:18px; height:18px; stroke:var(--text); stroke-width:2; fill:none; }
+
+  /* === INDICATORS === */
+  .page-dots { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:100; display:flex; gap:7px; }
+  .page-dot {
+    width:7px; height:7px; border-radius:50%; background:rgba(13,33,55,0.18);
+    transition:all 0.4s; cursor:pointer;
+  }
+  .page-dot.active { background:var(--cyan); box-shadow:0 0 8px rgba(0,131,143,0.4); transform:scale(1.35); }
+  .page-num {
+    position:fixed; bottom:18px; right:24px; z-index:100;
+    font-family:'Orbitron',monospace; font-size:11px; color:rgba(13,33,55,0.3); letter-spacing:2px;
+  }
+
+  /* === MODAL === */
+  .modal-overlay {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(13,33,55,0.35); backdrop-filter:blur(4px);
+    z-index:2000; display:flex; align-items:center; justify-content:center;
+    animation:fadeIn 0.25s ease-out;
+  }
+  .modal-overlay.hidden { display:none; }
+  @keyframes fadeIn { from{opacity:0} }
+  .modal-box {
+    background:rgba(255,255,255,0.92); backdrop-filter:blur(16px);
+    border-radius:14px; padding:36px; max-width:460px; width:90%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.18); text-align:center;
+    animation:modalIn 0.35s cubic-bezier(.25,.8,.25,1.2);
+  }
+  @keyframes modalIn { from{transform:translateY(30px) scale(0.9); opacity:0} }
+  .modal-box h3 { font-family:'Orbitron',monospace; color:var(--cyan); margin-bottom:12px; letter-spacing:2px; }
+  .modal-box p { color:var(--text-dim); margin-bottom:20px; font-size:0.9rem; }
+  .modal-btn {
+    background:var(--cyan); color:white; border:none; padding:10px 28px;
+    border-radius:24px; cursor:pointer; letter-spacing:1px; font-family:'Noto Sans SC',sans-serif;
+    transition:all 0.3s;
+  }
+  .modal-btn:hover { background:#006064; box-shadow:0 4px 14px rgba(0,131,143,0.25); }
+
+  /* === RIPPLE === */
+  .ripple {
+    position:absolute; border-radius:50%; background:rgba(0,131,143,0.18);
+    transform:scale(0); animation:ripple 0.55s ease-out; pointer-events:none;
+  }
+  @keyframes ripple { to{transform:scale(4); opacity:0} }
+
+  /* === RESPONSIVE === */
+  @media(max-width:768px) {
+    .page-hero { flex:0 0 30%; }
+    .page-body { padding:16px 20px 20px; }
+    .cards { grid-template-columns:1fr; }
+    .pl-grid { grid-template-columns:1fr 1fr; }
+    .stat-grid { grid-template-columns:repeat(2,1fr); }
+    h2 { font-size:1.1rem; }
+    .nav-arrow { width:34px; height:34px; }
+    .hero-content { padding:28px; }
+    .hero-content h1 { font-size:1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="skyCanvas"></canvas>
+<div class="grid-bg"></div>
+
+<button class="nav-arrow nav-prev" id="navPrev" title="上一页">
+  <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
+</button>
+<button class="nav-arrow nav-next" id="navNext" title="下一页">
+  <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
+</button>
+
+<div class="page-dots" id="pageDots"></div>
+<div class="page-num" id="pageNum">01 / 08</div>
+
+<!-- ============ STAGE ============ -->
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- PAGE 0: Cover -->
+<div class="page active" data-page="0">
+  <div class="page-hero full">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/NASA_N3-X_hybrid_wing_aircraft.jpg?width=1400"
+         alt="NASA N3-X hybrid wing electric aircraft concept"
+         onerror="this.parentElement.style.background='linear-gradient(135deg,#001a33,#003366,#004d80)';this.style.display='none';">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="sub">Flight Electrification</p>
+      <h1>航空发动机<br>电气化</h1>
+      <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-top:12px;">从辅助系统到主推进系统 · 用电能重新定义飞行的未来</p>
+      <p style="font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:3px;margin-top:20px;" class="cover-hint">→ 点击页面两侧或按方向键翻页 →</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 1: Concept -->
+<div class="page right" data-page="1">
+  <div class="page-hero">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/CFM56-5Bs_engine.JPG?width=1200"
+         alt="CFM56 turbofan aircraft engine"
+         onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1a2a3a,#2a4a5a)';">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="page-body">
+    <div class="section-tag">01 / Concept</div>
+    <h2>航空发动机电气化是什么</h2>
+    <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:16px;">用电能部分或全部替代传统航空发动机中依靠机械、液压、气压传动的系统，从<b>辅助系统电气化</b>逐步向<b>主推进系统电气化</b>演进。</p>
+    <div class="cards">
+      <div class="card" data-detail="mee">
+        <div class="card-icon">⚡</div><h3>多电发动机 MEE</h3>
+        <p>电动燃油泵、电动液压泵替换传统附件。波音787发电机功率达<b>1MW</b>，A380达<b>600kW</b>，F-35集成起动机发电机<b>160kW</b>。</p>
+      </div>
+      <div class="card" data-detail="hybrid">
+        <div class="card-icon">🔌</div><h3>混合电推进</h3>
+        <p>发动机+电机联合驱动风扇，省油<b>10%~80%</b>。串联方案让发动机仅负责发电，电机驱动推进，设计自由度极大提升。</p>
+      </div>
+      <div class="card" data-detail="turbo">
+        <div class="card-icon">🌀</div><h3>涡轮电推进</h3>
+        <p>涡轮发电→电传至机身各处电机→<b>分布式推进(TeDP)</b>。NASA N3-X目标50MW，翼身融合构型，燃油节省<b>~70%</b>。</p>
+      </div>
+      <div class="card" data-detail="pure">
+        <div class="card-icon">🔋</div><h3>纯电推进</h3>
+        <p>完全电池供电驱动电机。适用于<b>1~50座</b>短途飞机和eVTOL。最大瓶颈：电池能量密度仅为航空煤油的 <b>1/50</b>。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Routes -->
+<div class="page right" data-page="2">
+  <div class="page-hero">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/BETA_Technologies_ALIA_250.jpg?width=1200"
+         alt="BETA Technologies ALIA 250 electric aircraft"
+         onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1a3344,#2a5566)';">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="page-body">
+    <div class="section-tag">02 / Routes</div>
+    <h2>六条技术路线对比</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>路线</th><th>推力来源</th><th>能量来源</th><th>代表项目</th><th>成熟度</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--text);font-weight:600">多电发动机 MEE</td><td>涡扇发动机</td><td>燃油+电气化附件</td><td>波音787 / F-35 / A380</td><td style="color:#2e7d32">▮▮▮▮ 已商用</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">并联混动</td><td>发动机+电机联合</td><td>燃油+电池</td><td>Rolls-Royce M250混动</td><td style="color:#f9a825">▮▮▮ 地面测试</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">串联混动</td><td>电机驱动风扇</td><td>燃油→发电+电池</td><td>E-Fan X (空客/罗罗)</td><td style="color:#f9a825">▮▮▮ 原型验证</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">涡轮电推进</td><td>分布式电风扇</td><td>燃油→发电</td><td>NASA N3-X / STARC-ABL</td><td style="color:#ef6c00">▮▮ 概念/仿真</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">纯电推进</td><td>电风扇/螺旋桨</td><td>电池</td><td>eVTOL / Eviation Alice</td><td style="color:#f9a825">▮▮▮ 小规模商用</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">氢燃料电池+混动</td><td>电机</td><td>氢燃料电池+燃机</td><td>DLR FlyECO (1MW级)</td><td style="color:#ef6c00">▮▮ 研究验证</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: Timeline -->
+<div class="page right" data-page="3">
+  <div class="page-hero">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Joby_Aviation_S4_experimental_eVTOL_aircraft_at_Edwards_AFB.jpg?width=1200"
+         alt="Joby S4 eVTOL electric aircraft at Edwards AFB"
+         onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#223344,#334455)';">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="page-body">
+    <div class="section-tag">03 / Timeline</div>
+    <h2>发展路线图</h2>
+    <div class="tl">
+      <div class="tl-i"><div class="tl-d"></div><div class="tl-y">2020 — 今日</div><h4>多电发动机量产应用</h4><p>波音787 1MW发电机、F-35集成起动机发电机、A380 600kW电力系统。</p></div>
+      <div class="tl-i"><div class="tl-d" style="background:#f9a825;box-shadow:0 0 10px rgba(249,168,37,0.4)"></div><div class="tl-y">2025 — 2028</div><h4>eVTOL商业运营 · 小型混动首飞</h4><p>城市空中交通(UAM)规模化运营。赛峰、霍尼韦尔兆瓦级混动飞行验证。</p></div>
+      <div class="tl-i"><div class="tl-d" style="background:#ef6c00;box-shadow:0 0 10px rgba(239,108,0,0.4)"></div><div class="tl-y">2030 — 2035</div><h4>支线飞机混动化 · 氢能概念验证</h4><p>1~5MW混动支线客机。空客ZeroE氢能验证机试飞。NASA STARC-ABL边界层吸入电推进验证。</p></div>
+      <div class="tl-i"><div class="tl-d" style="background:#c62828;box-shadow:0 0 10px rgba(198,40,40,0.4)"></div><div class="tl-y">2035 — 2040</div><h4>纯电短途干线 · 分布式推进商用</h4><p>电池突破500Wh/kg。纯电区域干线飞机投用。翼身融合+分布式电推进构型商用。</p></div>
+      <div class="tl-i"><div class="tl-d" style="background:#7b1fa2;box-shadow:0 0 10px rgba(123,31,162,0.4)"></div><div class="tl-y">2040 — 2050</div><h4>大型商用飞机全面电气化</h4><p>50MW级涡轮电推进、超导电机、氢+燃机混动进入宽体客机。航空业碳中和决定性一步。</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: Stats -->
+<div class="page right" data-page="4">
+  <div class="page-body centered" style="background:linear-gradient(180deg,#f8fafc,#eef3f8);">
+    <div class="section-tag">04 / Data</div>
+    <h2>关键数据</h2>
+    <div class="stat-grid" style="width:100%;max-width:760px;margin-bottom:28px;">
+      <div class="stat"><div class="stat-val">1 MW</div><div class="stat-lbl">波音787发电机功率（当前最大非推进电力负载）</div></div>
+      <div class="stat"><div class="stat-val">50×</div><div class="stat-lbl">航空煤油 vs 锂电池能量密度差距（~12000 vs ~250 Wh/kg）</div></div>
+      <div class="stat"><div class="stat-val">5×</div><div class="stat-lbl">航空电机功率密度需达车载电机的倍数（~25 vs ~5 kW/kg）</div></div>
+      <div class="stat"><div class="stat-val">50 MW</div><div class="stat-lbl">NASA N3-X 涡轮电推进系统设计总功率</div></div>
+      <div class="stat"><div class="stat-val">3,000 V</div><div class="stat-lbl">下一代航空高压直流母线目标电压等级</div></div>
+      <div class="stat"><div class="stat-val">500+</div><div class="stat-lbl">纯电支线客机商用所需电池能量密度 Wh/kg</div></div>
+      <div class="stat"><div class="stat-val">555.9</div><div class="stat-lbl">世界最快纯电飞机速度纪录 km/h（罗罗ACCEL，FAI认证）</div></div>
+      <div class="stat"><div class="stat-val">~70%</div><div class="stat-lbl">NASA N3-X 较波音777-200LR的燃油节省目标</div></div>
+    </div>
+    <div class="section-tag">功率等级演进</div>
+    <svg viewBox="0 0 720 80" style="width:100%;max-width:720px;margin-top:8px;">
+      <line x1="30" y1="50" x2="690" y2="50" stroke="rgba(0,131,143,0.2)" stroke-width="2"/>
+      <circle cx="140" cy="50" r="9" fill="#00838f"/><text x="140" y="34" text-anchor="middle" fill="#00838f" font-size="9" font-family="Orbitron">1MW</text><text x="140" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">787 / 当前</text>
+      <circle cx="310" cy="50" r="12" fill="#f9a825"/><text x="310" y="32" text-anchor="middle" fill="#f9a825" font-size="9" font-family="Orbitron">2~5MW</text><text x="310" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">E-Fan X / STARC-ABL</text>
+      <circle cx="500" cy="50" r="15" fill="#ef6c00"/><text x="500" y="30" text-anchor="middle" fill="#ef6c00" font-size="9" font-family="Orbitron">10~20MW</text><text x="500" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">支线客机混动</text>
+      <circle cx="660" cy="50" r="18" fill="#c62828"/><text x="660" y="28" text-anchor="middle" fill="#c62828" font-size="9" font-family="Orbitron">50MW+</text><text x="660" y="68" text-anchor="middle" fill="rgba(13,33,55,0.45)" font-size="7" font-family="Noto Sans SC">大型宽体客机</text>
+      <line x1="30" y1="50" x2="660" y2="50" stroke="rgba(13,71,161,0.3)" stroke-width="2.5"/>
+    </svg>
+  </div>
+</div>
+
+<!-- PAGE 5: Challenges -->
+<div class="page right" data-page="5">
+  <div class="page-hero">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Moteur_M53-P2_(cropped).JPG?width=1200"
+         alt="M53-P2 turbofan engine - aircraft engine technology"
+         onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1a2a3a,#2a4455)';">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="page-body">
+    <div class="section-tag">05 / Challenges</div>
+    <h2>关键技术挑战</h2>
+    <div class="cards">
+      <div class="card" data-detail="battery"><div class="card-icon">🪫</div><h3>电池能量密度</h3><p>商用锂电池<b>250~320 Wh/kg</b>，航空煤油<b>~12,000 Wh/kg</b>。需达<b>500~1,000 Wh/kg</b>才有支线经济性。固态电池、锂硫电池是主要希望。</p></div>
+      <div class="card" data-detail="motor"><div class="card-icon">🧲</div><h3>电机功率密度</h3><p>航空电机需达<b>15~25 kW/kg</b>（车载仅~5kW/kg）。华中科大磁场调制型电机国际领先。远期超导电机(LTS/HTS)是关键方案。</p></div>
+      <div class="card" data-detail="hv"><div class="card-icon">⚡</div><h3>高压电气安全</h3><p>电压从<b>540V</b>向<b>1,000~3,000V</b>演进。高空低气压导致<b>局部放电</b>剧增。碳纳米管导体、超导电缆是前沿方向。</p></div>
+      <div class="card" data-detail="thermal"><div class="card-icon">🌡️</div><h3>热管理与多场耦合</h3><p>SiC/GaN可在240℃+工作但散热挑战巨大。气-热-电<b>多物理场耦合</b>建模极复杂。发动机与电推力<b>协同控制</b>算法尚在探索。</p></div>
+      <div class="card" data-detail="cert"><div class="card-icon">🛡️</div><h3>安全性与适航</h3><p>电池<b>热失控</b>（波音787教训）、高dV/dt产生的<b>EMC干扰</b>、新架构冗余设计。适航认证周期可能需<b>5~10年</b>。</p></div>
+      <div class="card" data-detail="cost"><div class="card-icon">🏭</div><h3>全生命周期经济性</h3><p>初期成本高但维护低（活动件减少<b>60%+</b>）、能效高（综合提升<b>15~30%</b>）。长航程高频次航线全生命周期有竞争力。</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: Players -->
+<div class="page right" data-page="6">
+  <div class="page-body" style="background:linear-gradient(180deg,#f8fafc,#eef3f8);">
+    <div class="section-tag">06 / Players</div>
+    <h2>全球主要参与者</h2>
+    <div class="pl-grid">
+      <a class="pl" href="https://www.nasa.gov/directorates/armd/integrated-aviation-systems-program/armd-iasp-epfd/about-electrified-powertrain-flight-demonstration-project/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🚀</div><div class="pl-info"><h4>NASA</h4><div class="org">美国国家航空航天局</div><div class="desc">N3-X / STARC-ABL涡轮电推进，NEAT试验平台，50MW级分布式推进概念</div></div></a>
+      <a class="pl" href="https://www.rolls-royce.com/innovation/electrical.aspx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">✈️</div><div class="pl-info"><h4>Rolls-Royce</h4><div class="org">罗尔斯·罗伊斯</div><div class="desc">E-Fan X、ACCEL竞速机(623km/h世界纪录)、M250混动、E2SG嵌入式发电机</div></div></a>
+      <a class="pl" href="https://www.airbus.com/en/innovation/energy-transition/hydrogen/zeroe" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🛫</div><div class="pl-info"><h4>Airbus</h4><div class="org">空中客车</div><div class="desc">ZeroE氢能概念机、四台2MW燃料电池电机、2027年地面集成测试</div></div></a>
+      <a class="pl" href="https://www.geaerospace.com/news/press-releases/ge-aerospace-successfully-demonstrates-narrowbody-hybrid-electric-engine-system" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">⚙️</div><div class="pl-info"><h4>GE / 赛峰 / 普惠</h4><div class="org">发动机三巨头</div><div class="desc">GE混动涡扇地面演示成功；赛峰ENGINeUS电机；普惠为混动支线机供GTF</div></div></a>
+      <a class="pl" href="https://aerospace.honeywell.com/us/en/pages/hybrid-electric-electric-propulsion" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🔧</div><div class="pl-info"><h4>Honeywell</h4><div class="org">霍尼韦尔</div><div class="desc">1MW级混动涡轮发电机、与DENSO联合开发电动飞机马达、Vertical Aerospace VX4合作</div></div></a>
+      <a class="pl" href="http://www.aecc.cn/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🇨🇳</div><div class="pl-info"><h4>中国航发 AECC</h4><div class="org">中国航空发动机集团</div><div class="desc">多电发动机控制系统自主化、兆瓦级混动系统，与高校联合攻关超20项</div></div></a>
+      <a class="pl" href="http://news.hust.edu.cn/info/1003/50657.htm" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🎓</div><div class="pl-info"><h4>华中科技大学</h4><div class="org">曲荣海团队 · IEEE Fellow</div><div class="desc">磁场调制型高功率密度电机系统，电机功率密度国际领先，中标航发兆瓦级电机</div></div></a>
+      <a class="pl" href="https://www.dlr.de/en/el/research-and-transfer/projects/current-projects/flyeco" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="pl-av">🇩🇪</div><div class="pl-info"><h4>DLR</h4><div class="org">德国宇航中心</div><div class="desc">FlyECO项目：SOFC燃料电池+氢气燃气轮机+电池混动，1MW级，零CO₂排放</div></div></a>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7: End -->
+<div class="page right" data-page="7">
+  <div class="page-hero full">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Joby_Aviation_S4_experimental_eVTOL_aircraft_at_Edwards_AFB.jpg?width=1400"
+         alt="Joby S4 eVTOL - the future of electric flight"
+         onerror="this.parentElement.style.background='linear-gradient(135deg,#001a33,#003366)';this.style.display='none';">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 style="font-size:clamp(1.5rem,3vw,2.4rem);">飞行的未来</h1>
+      <p style="color:rgba(255,255,255,0.8);font-size:0.95rem;max-width:550px;margin:12px auto;">
+        航空发动机电气化是航空业实现<b>2050碳中和</b>目标的关键路径<br><br>
+        从辅助系统电气化到纯电推进，每一步都在重新定义飞行
+      </p>
+      <p style="font-family:'Orbitron',monospace;font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:3px;margin-top:20px;">⏣ END OF BOOK ⏣</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+</div><!-- /stage -->
+
+<!-- ========== MODAL ========== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle">详情</h3>
+    <p id="modalDesc">此内容的详细信息页面即将上线，敬请期待。</p>
+    <button class="modal-btn" id="modalClose">关闭 CLOSE</button>
+  </div>
+</div>
+
+<script>
+// ==================== SKY CANVAS ====================
+const sc = document.getElementById('skyCanvas');
+const sctx = sc.getContext('2d');
+let pts = [], m = {x:-200,y:-200};
+function rsz() { sc.width=innerWidth; sc.height=innerHeight; }
+window.addEventListener('resize',rsz); rsz();
+
+class Pt {
+  constructor(){ this.rst(); this.y=Math.random()*sc.height; }
+  rst(){ this.x=Math.random()*sc.width; this.y=sc.height+10; this.s=Math.random()*2.2+0.7; this.sp=Math.random()*0.35+0.12; this.op=Math.random()*0.3+0.07; this.w=Math.random()*Math.PI*2; }
+  upd(){
+    this.y-=this.sp; this.w+=0.01; this.x+=Math.sin(this.w)*0.35;
+    const dx=m.x-this.x, dy=m.y-this.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+    if(d<180){ this.x+=(dx/d)*0.7; this.y+=(dy/d)*0.7; }
+    if(this.y<-20){ this.y=sc.height+10; this.x=Math.random()*sc.width; }
+  }
+  draw(c){
+    c.fillStyle=`rgba(0,131,143,${this.op})`;
+    c.beginPath(); c.arc(this.x,this.y,this.s,0,Math.PI*2); c.fill();
+  }
+}
+for(let i=0;i<60;i++) pts.push(new Pt());
+(function anim(){
+  sctx.clearRect(0,0,sc.width,sc.height);
+  pts.forEach(p=>{p.upd();p.draw(sctx);});
+  for(let i=0;i<pts.length;i+=4){
+    for(let j=i+4;j<pts.length;j+=4){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<90){ sctx.strokeStyle=`rgba(0,131,143,${0.035*(1-d/90)})`; sctx.lineWidth=0.4; sctx.beginPath(); sctx.moveTo(pts[i].x,pts[i].y); sctx.lineTo(pts[j].x,pts[j].y); sctx.stroke(); }
+    }
+  }
+  requestAnimationFrame(anim);
+})();
+document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY;});
+document.addEventListener('mouseleave',()=>{m.x=-200;m.y=-200;});
+
+// ==================== CURSOR TRAIL ====================
+const trails=[], N=5;
+for(let i=0;i<N;i++){
+  const el=document.createElement('div'); el.className='cursor-dot';
+  el.style.opacity=(1-i/N)*0.4; el.style.width=(7-i*1.1)+'px'; el.style.height=(7-i*1.1)+'px';
+  document.body.appendChild(el);
+  trails.push({el,x:0,y:0});
+}
+let tm={x:0,y:0};
+document.addEventListener('mousemove',e=>{tm.x=e.clientX;tm.y=e.clientY;});
+(function updTrails(){
+  let tx=tm.x, ty=tm.y;
+  trails.forEach((t,i)=>{
+    t.x+=(tx-t.x)*(0.22+i*0.04); t.y+=(ty-t.y)*(0.22+i*0.04);
+    t.el.style.left=t.x+'px'; t.el.style.top=t.y+'px'; tx=t.x; ty=t.y;
+  });
+  requestAnimationFrame(updTrails);
+})();
+
+// ==================== PAGE NAVIGATION ====================
+let cp=0;
+const TP=8;
+const pages=document.querySelectorAll('.page');
+const navPrev=document.getElementById('navPrev');
+const navNext=document.getElementById('navNext');
+const pageNum=document.getElementById('pageNum');
+const dotsC=document.getElementById('pageDots');
+let flipping=false;
+
+for(let i=0;i<TP;i++){
+  const d=document.createElement('div');
+  d.className='page-dot'+(i===0?' active':'');
+  d.addEventListener('click',()=>jumpTo(i));
+  dotsC.appendChild(d);
+}
+
+function updateUI(){
+  navPrev.classList.toggle('disabled',cp===0);
+  navNext.classList.toggle('disabled',cp===TP-1);
+  pageNum.textContent=String(cp+1).padStart(2,'0')+' / '+String(TP).padStart(2,'0');
+  document.querySelectorAll('.page-dot').forEach((d,i)=>d.classList.toggle('active',i===cp));
+}
+
+function setPageState(i,state){
+  pages[i].classList.remove('active','left','right');
+  if(state) pages[i].classList.add(state);
+}
+
+function flipFwd(){
+  if(flipping||cp>=TP-1) return; flipping=true;
+  setPageState(cp,'left');
+  cp++;
+  setPageState(cp,'active');
+  updateUI();
+  setTimeout(()=>{ flipping=false; },650);
+}
+
+function flipBwd(){
+  if(flipping||cp<=0) return; flipping=true;
+  setPageState(cp,'right');
+  cp--;
+  setPageState(cp,'active');
+  updateUI();
+  setTimeout(()=>{ flipping=false; },650);
+}
+
+function jumpTo(tgt){
+  if(flipping||tgt===cp) return;
+  flipping=true;
+  if(tgt>cp){
+    setPageState(cp,'left');
+    cp=tgt;
+    setPageState(cp,'active');
+  }else{
+    setPageState(cp,'right');
+    cp=tgt;
+    setPageState(cp,'active');
+  }
+  updateUI();
+  setTimeout(()=>{ flipping=false; },650);
+}
+
+navPrev.addEventListener('click',flipBwd);
+navNext.addEventListener('click',flipFwd);
+
+// Click zones on deck
+document.getElementById('deck').addEventListener('click',function(e){
+  if(e.target.closest('.card,.pl,.nav-arrow,button,a,.page-dot')) return;
+  const r=this.getBoundingClientRect();
+  const rx=e.clientX-r.left;
+  if(rx<r.width*0.22) flipBwd();
+  else if(rx>r.width*0.78) flipFwd();
+});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){ e.preventDefault(); flipFwd(); }
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); flipBwd(); }
+});
+
+// Touch
+let tsX=0,tsY=0;
+document.addEventListener('touchstart',e=>{ tsX=e.touches[0].clientX; tsY=e.touches[0].clientY; },{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tsX, dy=e.changedTouches[0].clientY-tsY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){ if(dx<0) flipFwd(); else flipBwd(); }
+});
+
+// Wheel: inside page → scroll content; outside → flip
+let wAcc=0, wTm=null;
+document.addEventListener('wheel',e=>{
+  const ap=pages[cp];
+  if(ap){
+    const r=ap.getBoundingClientRect();
+    if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom) return;
+  }
+  wAcc+=e.deltaY;
+  if(wTm) return;
+  wTm=setTimeout(()=>{
+    if(wAcc>35) flipFwd(); else if(wAcc<-35) flipBwd();
+    wAcc=0; wTm=null;
+  },250);
+},{passive:true});
+
+// Init
+updateUI();
+
+// ==================== MODAL ====================
+document.querySelectorAll('.card').forEach(el=>{
+  el.addEventListener('click',function(e){
+    const rp=document.createElement('span'); rp.className='ripple';
+    const rect=this.getBoundingClientRect();
+    const s=Math.max(rect.width,rect.height);
+    rp.style.width=rp.style.height=s+'px';
+    rp.style.left=(e.clientX-rect.left-s/2)+'px';
+    rp.style.top=(e.clientY-rect.top-s/2)+'px';
+    this.style.overflow='hidden';
+    this.appendChild(rp);
+    rp.addEventListener('animationend',()=>rp.remove());
+    const title=this.querySelector('h3')?.textContent||'详情';
+    document.getElementById('modalTitle').textContent=title;
+    document.getElementById('modalDesc').textContent='此内容的详细信息页面即将上线，敬请期待。\n\nTopic: '+(this.dataset.detail||'unknown');
+    document.getElementById('modalOverlay').classList.remove('hidden');
+  });
+});
+document.getElementById('modalClose').addEventListener('click',()=>{
+  document.getElementById('modalOverlay').classList.add('hidden');
+});
+document.getElementById('modalOverlay').addEventListener('click',function(e){
+  if(e.target===this) this.classList.add('hidden');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('modalOverlay').classList.add('hidden');
+});
+</script>
+</body>
+</html>
