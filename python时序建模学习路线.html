@@ -320,7 +320,7 @@
   }
 
   .pitfalls li::before {
-    content: "\26A0 ";
+    content: "⚠ ";
     font-size: 0.8rem;
   }
 
@@ -817,10 +817,10 @@ function copyCode(btn) {
   const text = pre.textContent;
   navigator.clipboard.writeText(text).then(() => {
     btn.classList.add('copied');
-    btn.textContent = '\u2713';
+    btn.textContent = '✓';
     setTimeout(() => {
       btn.classList.remove('copied');
-      btn.textContent = '\u2398';
+      btn.textContent = '⎘';
     }, 1800);
   });
 }
