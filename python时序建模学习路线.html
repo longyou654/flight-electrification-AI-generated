@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Python 时间序列建模学习路线</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #fafafa;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --border: #e8e8e8;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --tag-bg: #f3f4f6;
+    --code-bg: #f8f9fa;
+    --warn-bg: #fffbeb;
+    --warn-border: #fde68a;
+    --success-bg: #f0fdf4;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== Progress Bar ===== */
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    z-index: 1000;
+    transition: width 0.1s linear;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a5f 100%);
+    color: #fff;
+    padding: 80px 0 64px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .hero .subtitle {
+    font-size: 1.05rem;
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    backdrop-filter: blur(4px);
+  }
+
+  .ai-badge .dot {
+    width: 6px; height: 6px;
+    background: #60a5fa;
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ===== Container ===== */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== Phase Card ===== */
+  .phase {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 32px 0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  .phase.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .phase:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .phase-header {
+    padding: 28px 32px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .phase-num {
+    width: 40px; height: 40px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .phase:hover .phase-num {
+    transform: scale(1.05);
+  }
+
+  .phase-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+
+  .phase-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 16px;
+  }
+
+  .phase-body {
+    padding: 20px 32px 28px;
+  }
+
+  /* ===== Content blocks ===== */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin: 20px 0 8px;
+    font-weight: 600;
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .why {
+    background: var(--accent-light);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92rem;
+    color: #1e40af;
+    margin-bottom: 16px;
+  }
+
+  .why strong { color: #1e3a8a; }
+
+  .item {
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+    margin: 12px 0;
+    transition: border-color 0.2s ease;
+  }
+
+  .item:hover {
+    border-left-color: var(--accent);
+  }
+
+  .item h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .item p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  .item code {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.83em;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+
+  /* ===== Code block ===== */
+  .code-wrap {
+    position: relative;
+    margin: 12px 0;
+  }
+
+  .code-wrap pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 20px 24px;
+    padding-right: 52px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .code-wrap pre .kw { color: #c084fc; }
+  .code-wrap pre .fn { color: #60a5fa; }
+  .code-wrap pre .str { color: #86efac; }
+  .code-wrap pre .cm { color: #64748b; font-style: italic; }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+    color: #94a3b8;
+    font-size: 0.75rem;
+  }
+
+  .copy-btn:hover {
+    background: rgba(255,255,255,0.16);
+    color: #e2e8f0;
+  }
+
+  .copy-btn.copied {
+    background: rgba(34,197,94,0.2);
+    border-color: rgba(34,197,94,0.3);
+    color: #4ade80;
+  }
+
+  /* ===== Collapsible ===== */
+  .collapsible {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .collapsible summary {
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .collapsible summary::-webkit-details-marker { display: none; }
+
+  .collapsible summary .chevron {
+    font-size: 0.6rem;
+    transition: transform 0.25s ease;
+    display: inline-block;
+  }
+
+  .collapsible[open] summary .chevron {
+    transform: rotate(90deg);
+  }
+
+  /* ===== Pitfall card ===== */
+  .pitfalls {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    padding: 16px 20px;
+    font-size: 0.88rem;
+  }
+
+  .pitfalls .pitfall-title {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #92400e;
+  }
+
+  .pitfalls ul {
+    list-style: none;
+    padding: 8px 0 0;
+  }
+
+  .pitfalls li::before {
+    content: "\26A0 ";
+    font-size: 0.8rem;
+  }
+
+  .pitfalls li {
+    font-size: 0.85rem;
+    color: #78350f;
+    margin: 4px 0;
+  }
+
+  /* ===== Exercise ===== */
+  .exercise {
+    background: var(--success-bg);
+    padding: 16px 20px;
+    font-size: 0.85rem;
+  }
+
+  .exercise .ex-title {
+    font-weight: 600;
+    color: #166534;
+    font-size: 0.82rem;
+  }
+
+  .exercise p { color: #14532d; padding-top: 4px; }
+
+  /* ===== Flow ===== */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 24px 0;
+    font-size: 0.85rem;
+  }
+
+  .flow-step {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .flow-step:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+  }
+
+  .flow-arrow { color: var(--text-secondary); font-size: 0.8rem; }
+
+  /* ===== Table ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 12px 0;
+  }
+
+  th, td {
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  tbody tr { transition: background 0.15s ease; }
+
+  tbody tr:hover { background: #f8fafc; }
+
+  td:first-child code {
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    transition: background 0.15s ease;
+  }
+
+  tbody tr:hover td:first-child code {
+    background: #e8f0fe;
+  }
+
+  /* ===== Back to Top ===== */
+  #back-to-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 40px; height: 40px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 999;
+  }
+
+  #back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #back-to-top:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    color: var(--accent);
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+  }
+
+  /* ===== Print ===== */
+  @media print {
+    body { background: #fff; }
+    .hero { padding: 40px 0 32px; }
+    .phase { box-shadow: none; break-inside: avoid; margin: 20px 0; opacity: 1; transform: none; }
+    .container { max-width: 100%; }
+    #progress-bar, #back-to-top, .copy-btn { display: none !important; }
+    .phase:hover { transform: none; box-shadow: none; }
+    .collapsible[open] { } /* keep open in print */
+    details:not([open]) > :not(summary) { display: block !important; } /* show all in print */
+    details summary .chevron { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="hero">
+  <div class="container">
+    <h1>Python 时间序列建模</h1>
+    <p class="subtitle">一份给初学者的学习路线图</p>
+    <div class="ai-badge">
+      <span class="dot"></span>
+      AI 辅助生成
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ===== Phase 1 ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">1</div>
+    <div>
+      <div class="phase-title">数据准备 &mdash; 用 pandas 玩转时间序列</div>
+      <div class="phase-meta"><span>1 &ndash; 2 天</span><span>pandas</span></div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="why">
+      <strong>为什么要从这里开始？</strong><br>
+      不管后面用什么模型，80% 的时间都在处理数据。时间索引、重采样、滞后特征——这三样是基础功，基础不牢后面寸步难行。
+    </div>
+
+    <div class="section-label">核心操作</div>
+
+    <div class="item">
+      <h4>时间索引 <code>.set_index()</code> / <code>pd.to_datetime()</code></h4>
+      <p>让 DataFrame 知道哪一列是时间，才能做后续所有操作。</p>
+    </div>
+
+    <div class="item">
+      <h4>重采样 <code>.resample()</code></h4>
+      <p>把秒级数据聚合成分钟/小时/天，或者把日数据降成周/月。业务里最常用的操作之一。</p>
+    </div>
+
+    <div class="item">
+      <h4>滞后特征 <code>.shift()</code></h4>
+      <p>把昨天的值、上周的值当作特征。这是把时序问题转换成回归问题的关键一步。</p>
+    </div>
+
+    <div class="item">
+      <h4>滑动窗口 <code>.rolling()</code></h4>
+      <p>过去 N 天的均值、标准差，用来捕捉短期趋势和波动。</p>
+    </div>
+
+    <div class="item">
+      <h4>差分 <code>.diff()</code></h4>
+      <p>当前值减去上一个值。把非平稳序列变成平稳序列的核心手段。</p>
+    </div>
+
+    <div class="code-wrap">
+      <pre><span class="cm"># 五分钟上手示例</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.read_csv(<span class="str">'data.csv'</span>)
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>])
+df = df.set_index(<span class="str">'date'</span>).sort_index()
+
+df[<span class="str">'lag_1'</span>] = df[<span class="str">'value'</span>].shift(1)        <span class="cm"># 昨天的值</span>
+df[<span class="str">'ma_7'</span>]  = df[<span class="str">'value'</span>].rolling(7).mean()  <span class="cm"># 7日均值</span>
+df[<span class="str">'d1'</span>]    = df[<span class="str">'value'</span>].diff(1)           <span class="cm"># 一阶差分</span>
+weekly  = df.resample(<span class="str">'W'</span>).mean()            <span class="cm"># 按周聚合</span></pre>
+      <button class="copy-btn" title="复制代码" onclick="copyCode(this)">&#x2398;</button>
+    </div>
+
+    <details class="collapsible">
+      <summary><span class="pitfalls" style="margin:0;border-radius:8px;width:100%;"><div class="pitfall-title"><span class="chevron">&#x25B6;</span> 新手常踩的坑</div></span></summary>
+      <div class="pitfalls" style="border-top:none;border-radius:0 0 8px 8px;margin-top:-1px;">
+        <ul>
+          <li>忘记 <code>.sort_index()</code>，导致 <code>.shift()</code> 结果错位</li>
+          <li>把未来的数据当特征用了（look-ahead bias），这在实战里极其致命</li>
+          <li>时区没统一，跨时区数据混着用导致时间戳对不齐</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><span class="exercise" style="margin:0;border-radius:8px;width:100%;"><div class="ex-title"><span class="chevron">&#x25B6;</span> 练手任务</div></span></summary>
+      <div class="exercise" style="border-radius:0 0 8px 8px;margin-top:-1px;">
+        <p>找一个带日期的 CSV 数据集，完成：① 设为时间索引并排序 ② 画出原始值、7日均值、一阶差分三条线 ③ 生成 lag_1 ~ lag_7 共 7 个滞后特征。做完这三步，pandas 时序操作就算入门了。</p>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ===== Phase 2 ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">2</div>
+    <div>
+      <div class="phase-title">经典方法 &mdash; ARIMA / ETS / Prophet</div>
+      <div class="phase-meta"><span>2 &ndash; 3 天</span><span>statsmodels &middot; prophet</span></div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="why">
+      <strong>为什么要先学经典方法？</strong><br>
+      这些模型可解释性强、部署轻量，在数据量不大的场景下效果不输深度学习。更重要的是——它们帮你建立对时序结构的直觉（趋势、季节、残差），这个直觉是你后面所有建模的基础。
+    </div>
+
+    <div class="section-label">三个模型</div>
+
+    <div class="item">
+      <h4>ARIMA / SARIMA</h4>
+      <p>最经典的时间序列模型。AR（自回归）用过去的值预测现在，MA（移动平均）用过去的误差修正现在，I（差分）让序列变平稳，S（季节性）处理周期模式。<br>
+      核心技能：学会看 <strong>ACF / PACF 图</strong> 来给模型定阶（p, d, q）。</p>
+    </div>
+
+    <div class="item">
+      <h4>Holt-Winters 指数平滑 (ETS)</h4>
+      <p>思路更直观：预测值 = 水平 + 趋势 + 季节，每个成分做加权平滑，越近的数据权重越大。适合有明显季节性且趋势变化不剧烈的场景。</p>
+    </div>
+
+    <div class="item">
+      <h4>Prophet（Meta 出品）</h4>
+      <p>拆成趋势 + 季节 + 节假日效应，自动检测变点。几行代码出结果、自带不确定性区间、对缺失值和异常值不敏感。<strong>最适合快速出业务 baseline</strong>。</p>
+    </div>
+
+    <details class="collapsible">
+      <summary><span class="pitfalls" style="margin:0;border-radius:8px;width:100%;"><div class="pitfall-title"><span class="chevron">&#x25B6;</span> 新手常踩的坑</div></span></summary>
+      <div class="pitfalls" style="border-top:none;border-radius:0 0 8px 8px;margin-top:-1px;">
+        <ul>
+          <li>不检查平稳性就直接套 ARIMA——先做 ADF 检验，不平稳就差分</li>
+          <li>把 ACF/PACF 图当装饰不看，随手拍一个 (p,d,q) 就开始调参</li>
+          <li>Prophet 默认假设数据有强周期性，用在无周期数据上效果会很差</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><span class="exercise" style="margin:0;border-radius:8px;width:100%;"><div class="ex-title"><span class="chevron">&#x25B6;</span> 练手任务</div></span></summary>
+      <div class="exercise" style="border-radius:0 0 8px 8px;margin-top:-1px;">
+        <p>用 Kaggle 的 Air Passengers 数据集：① 画时序分解图（trend / seasonal / residual）② 用 ADF 检验判断平稳性 ③ 看 ACF/PACF 图手动定一次阶 ④ 分别用 ARIMA 和 Prophet 做 12 步预测，对比 RMSE。</p>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ===== Phase 3 ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">3</div>
+    <div>
+      <div class="phase-title">机器学习方法 &mdash; 特征工程 + 树模型</div>
+      <div class="phase-meta"><span>2 &ndash; 3 天</span><span>XGBoost &middot; LightGBM</span></div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="why">
+      <strong>为什么这一步最关键？</strong><br>
+      把时间序列转成「监督学习」问题后，你可以把天气、节假日、促销活动、竞品价格——任何外部变量都塞进去。这比 ARIMA 灵活得多，也是工业界最主流的做法。
+    </div>
+
+    <div class="section-label">核心思路</div>
+
+    <div class="item">
+      <h4>把时序变成表格</h4>
+      <p>目标列 = 未来的值（比如明天），特征列 = 过去的 lag 值 + 滚动统计量 + 时间元信息（星期几、第几月、是否节假日）。每行是一个「用过去预测未来」的样本。</p>
+    </div>
+
+    <div class="item">
+      <h4>特征工程三件套</h4>
+      <p>① <strong>滞后特征</strong>：lag_1, lag_7, lag_30 — 不同时间尺度 ② <strong>滚动统计</strong>：rolling mean/std/min/max of 7/14/30 days ③ <strong>日期特征</strong>：dayofweek, month, quarter, is_weekend, is_holiday</p>
+    </div>
+
+    <div class="item">
+      <h4>XGBoost / LightGBM</h4>
+      <p>把上面造好的特征喂给树模型做回归。天然处理缺失值、自动捕捉非线性关系、特征重要性能看出哪些因素最关键。<strong>大部分时间序列比赛和工业项目的标配</strong>。</p>
+    </div>
+
+    <details class="collapsible">
+      <summary><span class="pitfalls" style="margin:0;border-radius:8px;width:100%;"><div class="pitfall-title"><span class="chevron">&#x25B6;</span> 新手常踩的坑</div></span></summary>
+      <div class="pitfalls" style="border-top:none;border-radius:0 0 8px 8px;margin-top:-1px;">
+        <ul>
+          <li><strong>数据泄露！</strong>用未来的信息造特征，比如用本周的均值去预测昨天的值</li>
+          <li>切训练/测试集时随机 shuffle——时间序列必须<strong>按时间顺序切分</strong></li>
+          <li>只用了 lag 特征忘了外部特征（天气、促销、节假日），浪费了树模型最大的优势</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><span class="exercise" style="margin:0;border-radius:8px;width:100%;"><div class="ex-title"><span class="chevron">&#x25B6;</span> 练手任务</div></span></summary>
+      <div class="exercise" style="border-radius:0 0 8px 8px;margin-top:-1px;">
+        <p>用同样的 Air Passengers 数据集：① 构造 lag_1 ~ lag_12 + rolling_mean_6/12 + month 特征 ② 用 LightGBM 做 12 步预测 ③ 对比和 ARIMA 的误差 ④ 画出 feature importance，看哪些特征贡献最大。</p>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ===== Phase 4 ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">4</div>
+    <div>
+      <div class="phase-title">深度学习方法 &mdash; 选学</div>
+      <div class="phase-meta"><span>按需</span><span>PyTorch &middot; pytorch-forecasting</span></div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="why">
+      <strong>什么时候才需要深度学习？</strong><br>
+      数据量极大（几十万条以上）、序列之间相互关联（比如几千个产品的销量一起预测）、或者前三个阶段的方法都试过了确实不够用。大部分业务场景前三个阶段就够了。
+    </div>
+
+    <div class="item">
+      <h4>LSTM / GRU</h4>
+      <p>循环神经网络的变体，能记住长距离的依赖关系。但调参麻烦、训练慢、容易过拟合——别一上来就用。</p>
+    </div>
+
+    <div class="item">
+      <h4>N-BEATS / TFT</h4>
+      <p>更现代的专用时序架构。N-BEATS 纯 MLP 结构简单效果好；TFT（Temporal Fusion Transformer）能同时处理静态特征、已知未来（比如假期日期）和未知未来。都在 <code>pytorch-forecasting</code> 里有现成实现。</p>
+    </div>
+
+    <details class="collapsible">
+      <summary><span class="pitfalls" style="margin:0;border-radius:8px;width:100%;"><div class="pitfall-title"><span class="chevron">&#x25B6;</span> 新手常踩的坑</div></span></summary>
+      <div class="pitfalls" style="border-top:none;border-radius:0 0 8px 8px;margin-top:-1px;">
+        <ul>
+          <li>数据才几千条就上 LSTM——模型容量远大于数据量，必然过拟合</li>
+          <li>不做 baseline 直接上深度学习，最后发现比 ARIMA 还差</li>
+          <li>忘记做数据归一化，LSTM 对输入尺度敏感</li>
+        </ul>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ===== Flow ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">&rarr;</div>
+    <div>
+      <div class="phase-title">完整练手流程</div>
+      <div class="phase-meta">用一套数据集从头走到尾</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="flow">
+      <div class="flow-step">EDA & 可视化</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">时序分解</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">朴素 Baseline</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">ARIMA</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">Prophet</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">LightGBM</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-step">对比误差</div>
+    </div>
+
+    <p style="text-align:center; color: var(--text-secondary); font-size:0.85rem;">
+      每一步都不要跳过，每步的输出都是下一步的参照。<br>
+      朴素 Baseline = 直接用昨天的值当预测，任何模型如果比这个还差，那模型就有问题。
+    </p>
+
+  </div>
+</div>
+
+<!-- ===== Table ===== -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">&#x2666;</div>
+    <div>
+      <div class="phase-title">核心库速查</div>
+      <div class="phase-meta">按使用频率排序</div>
+    </div>
+  </div>
+  <div class="phase-body">
+    <table>
+      <thead>
+        <tr><th>库</th><th>用在哪</th><th>一句话</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>pandas</code></td><td>1 &ndash; 4</td><td>时间索引、重采样、滑窗，全部操作的基础</td></tr>
+        <tr><td><code>statsmodels</code></td><td>2</td><td>ARIMA、ETS、ADF检验、ACF/PACF 图</td></tr>
+        <tr><td><code>prophet</code></td><td>2</td><td>业务时序快速建模，几行代码出预测</td></tr>
+        <tr><td><code>scikit-learn</code></td><td>3</td><td>标准化、TimeSeriesSplit、评估指标</td></tr>
+        <tr><td><code>xgboost</code> / <code>lightgbm</code></td><td>3</td><td>特征工程后喂树模型，工业标配</td></tr>
+        <tr><td><code>sktime</code></td><td>1 &ndash; 3</td><td>sklearn 风格的时序工具库，统一接口</td></tr>
+        <tr><td><code>pytorch-forecasting</code></td><td>4</td><td>TFT、N-BEATS 等深度学习模型</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  建议先拿 statsmodels + prophet 各跑通一个例子，心里有数了再往深处走。
+</div>
+
+</div>
+
+<button id="back-to-top" title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#x2191;</button>
+
+<script>
+// --- Progress Bar ---
+const progressBar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+  progressBar.style.width = pct + '%';
+});
+
+// --- Scroll-triggered card fade-in ---
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('.phase').forEach(card => observer.observe(card));
+
+// --- Back to Top button ---
+const backBtn = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  if (document.documentElement.scrollTop > 500) {
+    backBtn.classList.add('show');
+  } else {
+    backBtn.classList.remove('show');
+  }
+});
+
+// --- Code Copy ---
+function copyCode(btn) {
+  const pre = btn.parentElement.querySelector('pre');
+  const text = pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '\u2713';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '\u2398';
+    }, 1800);
+  });
+}
+
+// --- Keyboard shortcut: Escape to collapse all details ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('details[open]').forEach(d => d.removeAttribute('open'));
+  }
+});
+</script>
+
+</body>
+</html>
