@@ -9,127 +9,106 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 2rem 1rem; }
   .container { max-width: 880px; margin: 0 auto; }
-  .header { text-align: center; padding: 3rem 1rem 2rem; border-bottom: 1px solid #334155; margin-bottom: 2.5rem; }
-  .header h1 { font-size: 2.2rem; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
-  .header .subtitle { color: var(--muted); }
-  .header .subtitle span { display: inline-block; background: #334155; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.8rem; color: var(--accent-blue); }
+  .header { text-align: center; padding: 3rem 1rem 2rem; border-bottom: 1px solid #334155; }
+  .header h1 { font-size: 2.2rem; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .section { margin-bottom: 3rem; }
-  .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; padding-bottom: 0.5rem; border-bottom: 2px solid #334155; }
-  .section-header h2 { font-size: 1.3rem; }
-  .card { background: var(--card); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; border: 1px solid #334155; transition: border-color 0.2s; }
-  .card:hover { border-color: #475569; }
-  .card h3 { color: #f1f5f9; margin-bottom: 0.3rem; }
-  .card .tag { display: inline-block; font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px; margin-bottom: 0.5rem; font-weight: 500; }
-  .tb { background: #075985; color: #7dd3fc; }
-  .ty { background: #713f12; color: #fde047; }
-  .tg { background: #14532d; color: #86efac; }
-  .card .meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.6rem; }
-  .card .meta a { color: var(--accent-blue); text-decoration: none; }
-  .card ul { margin-top: 0.4rem; padding-left: 1.2rem; font-size: 0.9rem; color: #cbd5e1; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  th { background: #1e293b; color: var(--accent-blue); padding: 0.7rem 1rem; border-bottom: 2px solid #334155; }
-  td { padding: 0.7rem 1rem; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
-  .footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding-top: 2rem; border-top: 1px solid #334155; margin-top: 2rem; }
+  .section-header { display: flex; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 0.5rem; }
+  .card { background: var(--card); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; border: 1px solid #334155; }
+  .card h3 { color: #f1f5f9; }
+  .card .tag { display: inline-block; font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px; }
+  .tb { background: #075985; color: #7dd3fc; } .ty { background: #713f12; color: #fde047; } .tg { background: #14532d; color: #86efac; }
+  .card a { color: var(--accent-blue); text-decoration: none; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1e293b; color: var(--accent-blue); padding: 0.7rem; border-bottom: 2px solid #334155; }
+  td { padding: 0.7rem; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+  .footer { text-align: center; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #334155; padding-top: 2rem; margin-top: 2rem; }
 </style>
 </head>
 <body>
 <div class="container">
 <div class="header">
   <h1>✈️ 航空发动机电气化</h1>
-  <div class="subtitle">全球具体案例大全 <span>🏭 11 个项目</span> <span>📚 10+ 来源</span></div>
-  <div class="subtitle" style="margin-top:0.5rem;font-size:0.82rem;">🗓️ 整理日期：2026-05-14</div>
+  <p>全球具体案例大全 🏭 11 个项目 📚 10+ 来源 🗓️ 2026-05-14</p>
 </div>
 
 <div class="section">
   <div class="section-header"><h2>⚡ 一、纯电动（全电推进）</h2></div>
   <div class="card">
     <span class="tag tb">✅ 已取证</span>
-    <h3>Pipistrel Velis Electro — 世界首款取证电动飞机</h3>
-    <div class="meta"><a href="https://en.wikipedia.org/wiki/Electric_aircraft" target="_blank">Wikipedia - Electric aircraft</a></div>
-    <ul><li>斯洛文尼亚 Pipistrel 公司，2020 年 6 月获 EASA 型号认证</li><li>全电动双座教练机，续航约 50 分钟</li><li>已被全球多家航校用于飞行员训练</li></ul>
+    <h3>Pipistrel Velis Electro - 世界首款取证电动飞机</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Electric_aircraft">Wikipedia</a></p>
+    <ul><li>Pipistrel 公司，2020 年获 EASA 认证</li><li>全电动双座教练机，续航 50 分钟</li></ul>
   </div>
   <div class="card">
     <span class="tag tb">🏭 量产中</span>
-    <h3>Lange E1 Antares — 最早量产的电动飞机</h3>
-    <div class="meta"><a href="https://en.wikipedia.org/wiki/Electric_aircraft" target="_blank">Wikipedia</a></div>
-    <ul><li>1999 年首飞，2004 年起交付超 100 架</li><li>累计电动飞行 16.5 万小时（截至 2022 年）</li><li>机翼集成电池系统，拥有专利设计</li></ul>
+    <h3>Lange E1 Antares - 最早量产的电动飞机</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Electric_aircraft">Wikipedia</a></p>
+    <ul><li>1999 年首飞，交付超 100 架</li><li>累计飞行 16.5 万小时</li></ul>
   </div>
   <div class="card">
     <span class="tag tb">🌍 已实现</span>
-    <h3>Solar Impulse 2 — 太阳能环球飞行</h3>
-    <div class="meta"><a href="https://en.wikipedia.org/wiki/Electric_aircraft" target="_blank">Wikipedia</a></div>
-    <ul><li>2015-2016 年完成无燃料环球飞行</li><li>机翼铺满 17,000 多块太阳能电池</li><li>证明全电远程飞行的可行性</li></ul>
+    <h3>Solar Impulse 2 - 太阳能环球飞行</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Electric_aircraft">Wikipedia</a></p>
+    <ul><li>2015-2016 年无燃料环球飞行</li><li>17000+ 块太阳能电池</li></ul>
   </div>
 </div>
 
 <div class="section">
-  <div class="section-header"><h2>🔋 二、混合动力（涡轮发电 + 电动）</h2></div>
+  <div class="section-header"><h2>🔋 二、混合动力</h2></div>
   <div class="card">
     <span class="tag ty">✈️ 验证机</span>
-    <h3>空客 EcoPulse — 分布式混合推进验证机</h3>
-    <div class="meta"><a href="https://www.airbus.com/en/innovation/energy-transition/hybrid-and-electric-flight" target="_blank">Airbus</a></div>
-    <ul><li>空客 + Daher + Safran 联合研发</li><li>分布式电动螺旋桨 + 涡轮发电机供电</li><li>目标降低 5% 油耗</li></ul>
+    <h3>空客 EcoPulse - 分布式混合推进</h3>
+    <p><a href="https://www.airbus.com/en/innovation/energy-transition/hybrid-and-electric-flight">Airbus</a></p>
+    <ul><li>空客+Daher+Safran</li><li>降低 5% 油耗</li></ul>
   </div>
   <div class="card">
     <span class="tag ty">✈️ 验证机</span>
-    <h3>空客 E-Fan X — 百座级混合动力验证机</h3>
-    <div class="meta"><a href="https://en.wikipedia.org/wiki/Hybrid_electric_aircraft" target="_blank">Wikipedia</a></div>
-    <ul><li>空客 + Rolls-Royce + Siemens 三方合作</li><li>2MW 级电动发动机替换涡扇</li></ul>
+    <h3>空客 E-Fan X - 百座级混合动力</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Hybrid_electric_aircraft">Wikipedia</a></p>
+    <ul><li>空客+RR+Siemens</li><li>2MW 级电动发动机</li></ul>
   </div>
   <div class="card">
     <span class="tag ty">🚀 已首飞</span>
-    <h3>Diamond DA36 E-Star — 串列混合动力首飞</h3>
-    <div class="meta"><a href="https://en.wikipedia.org/wiki/Hybrid_electric_aircraft" target="_blank">Wikipedia</a></div>
-    <ul><li>2011 年世界首次串列混合动力飞行</li><li>油耗降低 25%，可扩展至百座级</li></ul>
+    <h3>Diamond DA36 E-Star - 串列混合动力</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Hybrid_electric_aircraft">Wikipedia</a></p>
+    <ul><li>2011 年世界首次</li><li>油耗降低 25%</li></ul>
   </div>
 </div>
 
 <div class="section">
-  <div class="section-header"><h2>💚 三、氢燃料 / 氢电推进</h2></div>
+  <div class="section-header"><h2>💚 三、氢燃料/氢电推进</h2></div>
   <div class="card">
     <span class="tag tg">🇨🇳 全球首次</span>
-    <h3>中国氢燃料涡桨发动机试飞成功（2026.04）</h3>
-    <div class="meta"><a href="https://www.youtube.com/watch?v=KaWpIh9ksAs" target="_blank">YouTube</a></div>
-    <ul><li>全球首次氢燃料涡桨发动机试飞</li><li>领先空客等竞争对手</li><li>中国氢能航空动力重大突破</li></ul>
+    <h3>中国氢燃料涡桨发动机 2026.04</h3>
+    <ul><li>全球首次氢燃料涡桨试飞</li><li>领先空客</li></ul>
   </div>
   <div class="card">
     <span class="tag tg">🧪 适航中</span>
-    <h3>ZeroAvia — 氢电推进领军者</h3>
-    <div class="meta"><a href="https://zeroavia.com/flight-testing/" target="_blank">ZeroAvia</a></div>
-    <ul><li>氢燃料电池电动推进系统</li><li>FAA 发布 ZA601(600kW) 审定条件</li><li>Dornier 228 验证机试飞完成</li></ul>
+    <h3>ZeroAvia 氢电推进</h3>
+    <p><a href="https://zeroavia.com/flight-testing/">ZeroAvia</a></p>
+    <ul><li>FAA 审定 ZA601(600kW)</li><li>Dornier 228 试飞完成</li></ul>
   </div>
   <div class="card">
     <span class="tag tg">🔬 测试中</span>
-    <h3>Rolls-Royce + easyJet 氢燃料测试</h3>
-    <div class="meta">新闻 2026.04</div>
-    <ul><li>NASA 完成氢燃料发动机全循环测试</li><li>AE 2100 发动机燃烧纯氢</li></ul>
+    <h3>RR + easyJet 氢燃料测试</h3>
+    <ul><li>NASA 完成氢燃料全循环测试</li></ul>
   </div>
   <div class="card">
     <span class="tag tg">🛫 研发中</span>
-    <h3>Heart Aerospace ES-30 — 30 座混合电动飞机</h3>
-    <div class="meta"><a href="https://heartaerospace.com/" target="_blank">Heart Aerospace</a></div>
-    <ul><li>瑞典公司，美联航/加航/Saab 投资</li><li>纯电 200km / 混合 400km</li><li>目标 2028 年运营</li></ul>
+    <h3>Heart Aerospace ES-30</h3>
+    <p><a href="https://heartaerospace.com/">Heart Aerospace</a></p>
+    <ul><li>30 座，纯电 200km/混合 400km</li><li>目标 2028 年</li></ul>
   </div>
 </div>
 
 <div class="section">
-  <div class="section-header"><h2>📊 宏观趋势数据</h2></div>
-  <table><thead><tr><th>指标</th><th>数据</th><th>来源</th></tr></thead>
+  <h2>📊 宏观趋势</h2>
+  <table><thead><tr><th>指标</th><th>数据</th></tr></thead>
   <tbody>
-    <tr><td>2018 年电动飞机项目</td><td>~100 个</td><td><a href="https://en.wikipedia.org/wiki/Electric_aircraft" style="color:#38bdf8;">Wikipedia</a></td></tr>
-    <tr><td>2023 年</td><td>约 700 个</td><td><a href="https://en.wikipedia.org/wiki/Electric_aircraft" style="color:#38bdf8;">Wikipedia</a></td></tr>
-    <tr><td>技术分布</td><td>73% 纯电 / 31% 混动</td><td><a href="https://en.wikipedia.org/wiki/Electric_aircraft" style="color:#38bdf8;">Wikipedia</a></td></tr>
+    <tr><td>2018 年电动飞机项目</td><td>~100 个</td></tr>
+    <tr><td>2023 年</td><td>约 700 个</td></tr>
+    <tr><td>技术分布</td><td>73% 纯电 / 31% 混动</td></tr>
   </tbody></table>
-</div>
-
-<div class="section">
-  <div class="section-header"><h2>🗺️ 技术路线图</h2></div>
-  <div class="card">
-    <p>⚡ 纯电动 → <strong>已商用</strong></p>
-    <p>🔋 混合动力 → <strong>验证中</strong></p>
-    <p>💚 氢电推进 → <strong>适航审定</strong></p>
-    <p>🔥 氢燃烧 → <strong>研发测试</strong></p>
-  </div>
 </div>
 
 <div class="footer">
